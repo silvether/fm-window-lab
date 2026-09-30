@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FM Window Lab Parent</title>
+  <style>
+    :root {
+      --bg: #0b1014;
+      --panel: #141c22;
+      --panel-2: #1b262e;
+      --ink: #e7eef3;
+      --muted: #8ea0ad;
+      --line: #2a3a45;
+      --accent: #2ec4b6;
+      --accent-2: #f4a261;
+      --warn: #e76f51;
+      --ok: #7bd389;
+      --mono: "IBM Plex Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+      --sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); }
+    body { min-height: 100vh; }
+    a { color: var(--accent); }
+    code, kbd, .mono { font-family: var(--mono); font-size: 0.86em; }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 22px 80px; }
+    header.hero { border: 1px solid var(--line); background: linear-gradient(180deg, #182228 0%, #10171c 100%); padding: 22px 24px; margin-bottom: 22px; }
+    header.hero h1 { margin: 0 0 8px; font-size: 1.55rem; letter-spacing: 0.02em; }
+    header.hero p { margin: 0 0 10px; color: var(--muted); line-height: 1.5; }
+    .badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .badge { border: 1px solid var(--line); background: #0f161b; color: var(--muted); padding: 3px 8px; font-size: 12px; font-family: var(--mono); }
+    .badge.ok { color: var(--ok); border-color: #2d5a3a; }
+    .badge.warn { color: var(--accent-2); border-color: #5a4630; }
+    .grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+    @media (min-width: 900px) { .grid.two { grid-template-columns: 1.15fr 0.85fr; } }
+    .card { border: 1px solid var(--line); background: var(--panel); }
+    .card h2 { margin: 0; padding: 12px 16px; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase; border-bottom: 1px solid var(--line); background: var(--panel-2); }
+    .card .body { padding: 14px 16px 16px; }
+    .test { border: 1px solid var(--line); background: #10171c; padding: 14px 14px 12px; margin-bottom: 12px; }
+    .test:last-child { margin-bottom: 0; }
+    .test .top { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+    .test h3 { margin: 0 0 6px; font-size: 16px; }
+    .tid { font-family: var(--mono); color: var(--accent); font-size: 12px; }
+    .meta { color: var(--muted); font-size: 13px; line-height: 1.55; margin: 0 0 10px; }
+    .meta strong { color: var(--ink); font-weight: 600; }
+    .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    button, .btn {
+      appearance: none; border: 1px solid #3b5561; background: #1e333c; color: var(--ink);
+      padding: 8px 12px; font: 600 13px var(--sans); cursor: pointer;
+    }
+    button:hover, .btn:hover { background: #284650; border-color: var(--accent); }
+    button.secondary { background: #1a2228; }
+    a.btn { text-decoration: none; display: inline-block; }
+    input[type="text"], select {
+      background: #0b1115; color: var(--ink); border: 1px solid #3b5561;
+      padding: 8px 10px; font: 13px var(--mono); min-width: 180px;
+    }
+    table.cmd { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    table.cmd th, table.cmd td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
+    table.cmd th { background: #0f161b; color: var(--muted); font-weight: 600; }
+    table.cmd td.cmd { font-family: var(--mono); color: var(--accent); white-space: nowrap; }
+    table.cmd td.tgt { font-family: var(--mono); }
+    .note { font-size: 13px; color: var(--muted); line-height: 1.55; }
+    .warnbox { border: 1px solid #5a3a2e; background: #241812; color: #f0c7b8; padding: 10px 12px; font-size: 13px; margin: 0 0 14px; }
+    .okbox { border: 1px solid #2d5a3a; background: #102018; color: #c8efd2; padding: 10px 12px; font-size: 13px; margin: 0 0 14px; }
+    ul.tight { margin: 8px 0 0; padding-left: 18px; color: var(--muted); }
+    ul.tight li { margin: 4px 0; }
+    .log { font-family: var(--mono); font-size: 12px; background: #0b1115; border: 1px solid var(--line); padding: 10px; max-height: 220px; overflow: auto; white-space: pre-wrap; }
+    /* child pages */
+    .child { max-width: 720px; margin: 40px auto; padding: 0 18px; }
+    .child .panel { border: 1px solid var(--line); background: var(--panel); padding: 22px; }
+    .child h1 { margin: 0 0 6px; }
+    .marker { font-family: var(--mono); background: #0b1115; border: 1px dashed #3b5561; padding: 10px 12px; margin: 14px 0; color: var(--ok); }
+    .field { margin: 12px 0; }
+    .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    #child-status { margin-top: 10px; font-family: var(--mono); font-size: 13px; color: var(--accent-2); min-height: 1.2em; }
+  </style>
+</head>
+<body>
+<script>
+(function () {
+  const TESTS = {
+    "named-receipt": {
+      title: "FM Receipt Window",
+      name: "fmWinReceipt",
+      heading: "Named window.open receipt",
+      marker: "MARKER_RECEIPT_OK",
+      blurb: "Spawned with window.open(url, 'fmWinReceipt'). Katalon / FortiMonitor can select this by name=fmWinReceipt or title=FM Receipt Window."
+    },
+    "blank-open": {
+      title: "FM Blank Window",
+      name: "",
+      heading: "Unnamed window.open _blank",
+      marker: "MARKER_BLANK_OK",
+      blurb: "Spawned with window.open(url, '_blank'). No JS name. Select by title=FM Blank Window or selectPopUp with an empty / null id after the click."
+    },
+    "anchor-blank": {
+      title: "FM Anchor Blank",
+      name: "",
+      heading: "Anchor target=_blank",
+      marker: "MARKER_ANCHOR_BLANK_OK",
+      blurb: "Native <a target=\"_blank\">. Browser assigns no stable JS name. Select by title=FM Anchor Blank."
+    },
+    "anchor-named": {
+      title: "FM Invoice Window",
+      name: "fmWinInvoice",
+      heading: "Anchor target=fmWinInvoice",
+      marker: "MARKER_INVOICE_OK",
+      blurb: "Native <a target=\"fmWinInvoice\">. The browsing context name is fmWinInvoice. Select by name=fmWinInvoice or title=FM Invoice Window."
+    },
+    "form-ticket": {
+      title: "FM Form Ticket",
+      name: "",
+      heading: "Form target=_blank submit",
+      marker: "MARKER_FORM_TICKET_OK",
+      blurb: "Form submitted with target=_blank. Query string carries the typed subject. Select by title=FM Form Ticket."
+    },
+    "sized-popup": {
+      title: "FM Sized Popup",
+      name: "fmWinPopup",
+      heading: "Sized chrome-less popup",
+      marker: "MARKER_POPUP_OK",
+      blurb: "window.open with features string (width/height, no toolbar). Name fmWinPopup. Closest match to a real app print/preview dialog."
+    },
+    "delayed": {
+      title: "FM Delayed Window",
+      name: "fmWinDelayed",
+      heading: "Delayed window.open (800ms)",
+      marker: "MARKER_DELAYED_OK",
+      blurb: "Click schedules window.open after 800ms. FortiMonitor has no waitForPopUp — insert pause | 1500 before selectWindow."
+    }
+  };
+
+  const params = new URLSearchParams(location.search);
+  const childKey = params.get("child");
+
+  function childUrl(key, extra) {
+    const u = new URL(location.href);
+    u.search = "";
+    u.searchParams.set("child", key);
+    if (extra) {
+      Object.keys(extra).forEach(function (k) { u.searchParams.set(k, extra[k]); });
+    }
+    return u.toString();
+  }
+
+  function logLine(msg) {
+    const el = document.getElementById("event-log");
+    if (!el) return;
+    const t = new Date().toISOString().slice(11, 23);
+    el.textContent = "[" + t + "] " + msg + "\n" + el.textContent;
+  }
+
+  function renderChild(key) {
+    const spec = TESTS[key];
+    if (!spec) {
+      document.title = "FM Unknown Child";
+      document.body.innerHTML = '<div class="child"><div class="panel"><h1>Unknown child</h1><p class="note">No test mapped to this query.</p></div></div>';
+      return;
+    }
+    document.title = spec.title;
+    const subject = params.get("subject") || "";
+    document.body.innerHTML =
+      '<div class="child">' +
+        '<div class="panel">' +
+          '<p class="tid">CHILD / ' + key + (spec.name ? ' / name=' + spec.name : ' / unnamed') + '</p>' +
+          '<h1 id="child-heading">' + spec.heading + '</h1>' +
+          '<p class="note">' + spec.blurb + '</p>' +
+          '<div class="marker" id="child-marker">' + spec.marker + '</div>' +
+          (subject ? '<p class="note">Form subject received: <strong id="form-subject">' + subject.replace(/[<>&]/g, "") + '</strong></p>' : '') +
+          '<div class="field">' +
+            '<label for="child-note">Type here after focus moves into this window</label>' +
+            '<input id="child-note" name="child-note" type="text" placeholder="window-focus-confirmed" />' +
+          '</div>' +
+          '<div class="row">' +
+            '<button type="button" id="child-ack">Acknowledge focus</button>' +
+            '<button type="button" id="child-close" class="secondary">Close this window</button>' +
+          '</div>' +
+          '<div id="child-status"></div>' +
+          '<p class="note" style="margin-top:16px">After assertText / type, return to the parent with <code>selectWindow | null</code> or <code>deselectPopUp</code>. FortiMonitor supports both. Do not rely on <code>waitForPopUp</code> or <code>close</code> — those are not in the FortiMonitor multistep command list.</p>' +
+        '</div>' +
+      '</div>';
+    document.getElementById("child-ack").addEventListener("click", function () {
+      const v = document.getElementById("child-note").value || "(empty)";
+      document.getElementById("child-status").textContent = "FOCUS_ACK:" + v;
+    });
+    document.getElementById("child-close").addEventListener("click", function () {
+      window.close();
+    });
+  }
+
+  function renderParent() {
+    document.title = "FM Window Lab Parent";
+    document.body.innerHTML =
+      '<div class="wrap">' +
+        '<header class="hero">' +
+          '<h1>Window Spawn Lab</h1>' +
+          '<p>Parent page for a Katalon Recorder session that must move focus into a window a web application spawned. Each control uses a stable id. Each child uses a unique <code>&lt;title&gt;</code> and a unique marker string so <code>selectWindow</code>, <code>selectPopUp</code>, <code>assertTitle</code> and <code>assertText</code> have something deterministic to lock onto.</p>' +
+          '<p>FortiMonitor Browser Synthetic (Multistep) executes a subset of Selenese. Window focus in that engine is <code>selectWindow</code>, <code>selectPopUp</code>, <code>deselectPopUp</code>. There is no <code>waitForPopUp</code>. After a delayed spawn, insert <code>pause</code>.</p>' +
+          '<div class="badges">' +
+            '<span class="badge ok">title=FM Window Lab Parent</span>' +
+            '<span class="badge">id prefixes: t01–t07</span>' +
+            '<span class="badge warn">allow pop-ups for this origin</span>' +
+            '<span class="badge">same-file children via ?child=</span>' +
+          '</div>' +
+        '</header>' +
+
+        '<div class="warnbox">Chrome will silently eat <code>window.open</code> if this page is not opened from a real user gesture, or if the pop-up blocker is on. Record in Incognito, allow pop-ups, clear site data first — that is also FortiMonitor\'s documented Katalon procedure.</div>' +
+
+        '<div class="grid two">' +
+          '<div>' +
+            cardTests() +
+          '</div>' +
+          '<div>' +
+            '<section class="card" style="margin-bottom:14px">' +
+              '<h2>Recommended recording path</h2>' +
+              '<div class="body">' +
+                '<p class="note">Record one happy path, not every button. T01 plus return-to-parent is enough to prove focus movement. T06 is the realistic “app spawned a print dialog” case. T07 is the case that fails in FortiMonitor if you leave Katalon’s <code>waitForPopUp</code> in the XML.</p>' +
+                '<table class="cmd">' +
+                  '<tr><th>Command</th><th>Target</th><th>Value</th></tr>' +
+                  '<tr><td class="cmd">open</td><td class="tgt">this page URL</td><td></td></tr>' +
+                  '<tr><td class="cmd">assertTitle</td><td class="tgt">FM Window Lab Parent</td><td></td></tr>' +
+                  '<tr><td class="cmd">click</td><td class="tgt">id=t01-open</td><td></td></tr>' +
+                  '<tr><td class="cmd">pause</td><td class="tgt">800</td><td></td></tr>' +
+                  '<tr><td class="cmd">selectWindow</td><td class="tgt">title=FM Receipt Window</td><td></td></tr>' +
+                  '<tr><td class="cmd">assertTitle</td><td class="tgt">FM Receipt Window</td><td></td></tr>' +
+                  '<tr><td class="cmd">assertTextPresent</td><td class="tgt">MARKER_RECEIPT_OK</td><td></td></tr>' +
+                  '<tr><td class="cmd">type</td><td class="tgt">id=child-note</td><td>window-focus-confirmed</td></tr>' +
+                  '<tr><td class="cmd">click</td><td class="tgt">id=child-ack</td><td></td></tr>' +
+                  '<tr><td class="cmd">assertTextPresent</td><td class="tgt">FOCUS_ACK:window-focus-confirmed</td><td></td></tr>' +
+                  '<tr><td class="cmd">selectWindow</td><td class="tgt">null</td><td></td></tr>' +
+                  '<tr><td class="cmd">assertTitle</td><td class="tgt">FM Window Lab Parent</td><td></td></tr>' +
+                '</table>' +
+                '<p class="note" style="margin-top:10px">Alternate locator after T01: <code>selectWindow | name=fmWinReceipt</code>. Alternate return: <code>deselectPopUp</code>. Katalon may emit <code>win_ser_1</code>; replace that with <code>title=</code> or <code>name=</code> before pasting into FortiMonitor. Serial ids are recorder-local and are the usual reason a raw export fails in the probe.</p>' +
+              '</div>' +
+            '</section>' +
+            '<section class="card" style="margin-bottom:14px">' +
+              '<h2>Event log</h2>' +
+              '<div class="body">' +
+                '<div class="log" id="event-log">ready on parent\n</div>' +
+                '<div class="row" style="margin-top:8px">' +
+                  '<button type="button" id="btn-clear-log" class="secondary">Clear log</button>' +
+                '</div>' +
+              '</div>' +
+            '</section>' +
+            '<section class="card">' +
+              '<h2>FortiMonitor command filter</h2>' +
+              '<div class="body">' +
+                '<p class="note">Keep from the export:</p>' +
+                '<p class="mono" style="color:#c8efd2">open click clickAndWait type sendKeys pause selectWindow selectPopUp deselectPopUp assertTitle assertText assertTextPresent waitForPageToLoad waitForText waitForElementPresent windowMaximize</p>' +
+                '<p class="note" style="margin-top:10px">Strip or rewrite if Katalon emits them:</p>' +
+                '<p class="mono" style="color:#f0c7b8">waitForPopUp · close · closeWindow · selectWindow win_ser_N · storeWindowHandle · switchToWindow · echo · comment</p>' +
+              '</div>' +
+            '</section>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+    bindParent();
+  }
+
+  function cardTests() {
+    return (
+      '<section class="card">' +
+        '<h2>Spawn tests</h2>' +
+        '<div class="body">' +
+
+          testBlock(
+            "T01",
+            "Named window.open",
+            "JS name <strong>fmWinReceipt</strong>. Document title <strong>FM Receipt Window</strong>. Marker <strong>MARKER_RECEIPT_OK</strong>. This is the cleanest FortiMonitor example: click, pause, selectWindow by title or name, assert, type, return.",
+            '<button type="button" id="t01-open">Open named receipt window</button>'
+          ) +
+
+          testBlock(
+            "T02",
+            "Unnamed window.open(_blank)",
+            "No JS name. Title <strong>FM Blank Window</strong>. Marker <strong>MARKER_BLANK_OK</strong>. Use <code>selectWindow | title=FM Blank Window</code> or <code>selectPopUp</code> with empty target (first non-top window).",
+            '<button type="button" id="t02-open">Open unnamed _blank window</button>'
+          ) +
+
+          testBlock(
+            "T03",
+            "Anchor target=_blank",
+            "Declarative link, no window.open. Title <strong>FM Anchor Blank</strong>. Marker <strong>MARKER_ANCHOR_BLANK_OK</strong>. Katalon usually records <code>click</code> on <code>id=t03-open</code> then a window switch. Do not use <code>clickAndWait</code> here — the parent does not navigate.",
+            '<a class="btn" id="t03-open" href="#" target="_blank" rel="opener">Open via target=_blank</a>'
+          ) +
+
+          testBlock(
+            "T04",
+            "Anchor target=named",
+            "Declarative named context <strong>fmWinInvoice</strong>. Title <strong>FM Invoice Window</strong>. Marker <strong>MARKER_INVOICE_OK</strong>. Second click reuses the same window instead of spawning another — that is how many ticket systems behave.",
+            '<a class="btn" id="t04-open" href="#" target="fmWinInvoice" rel="opener">Open via target=fmWinInvoice</a>'
+          ) +
+
+          testBlock(
+            "T05",
+            "Form target=_blank",
+            "Submit opens the child. Title <strong>FM Form Ticket</strong>. Marker <strong>MARKER_FORM_TICKET_OK</strong>. Record <code>type</code> into <code>id=t05-subject</code>, <code>click</code> on <code>id=t05-submit</code>, then selectWindow by title.",
+            '<form id="t05-form" method="get" target="_blank">' +
+              '<input type="hidden" name="child" value="form-ticket" />' +
+              '<input id="t05-subject" name="subject" type="text" value="priority-reset" />' +
+              '<button type="submit" id="t05-submit">Submit ticket to new window</button>' +
+            '</form>'
+          ) +
+
+          testBlock(
+            "T06",
+            "Sized popup (app-style dialog)",
+            "window.open with a features string. Name <strong>fmWinPopup</strong>. Title <strong>FM Sized Popup</strong>. Marker <strong>MARKER_POPUP_OK</strong>. This is the shape of print preview, document viewer, and payment-complete dialogs.",
+            '<button type="button" id="t06-open">Open sized popup</button>'
+          ) +
+
+          testBlock(
+            "T07",
+            "Delayed spawn (800ms)",
+            "Click does not open immediately. Name <strong>fmWinDelayed</strong>. Title <strong>FM Delayed Window</strong>. Marker <strong>MARKER_DELAYED_OK</strong>. FortiMonitor cannot waitForPopUp. After the click, <code>pause | 1500</code>, then selectWindow.",
+            '<button type="button" id="t07-open">Schedule delayed window</button>'
+          ) +
+
+        '</div>' +
+      '</section>'
+    );
+  }
+
+  function testBlock(id, name, desc, controls) {
+    return (
+      '<article class="test" id="' + id.toLowerCase() + '-block">' +
+        '<div class="top"><h3>' + name + '</h3><span class="tid">' + id + '</span></div>' +
+        '<p class="meta">' + desc + '</p>' +
+        '<div class="row">' + controls + '</div>' +
+      '</article>'
+    );
+  }
+
+  function bindParent() {
+    document.getElementById("t01-open").addEventListener("click", function () {
+      const w = window.open(childUrl("named-receipt"), "fmWinReceipt");
+      logLine("T01 window.open name=fmWinReceipt title=FM Receipt Window handle=" + (!!w));
+    });
+    document.getElementById("t02-open").addEventListener("click", function () {
+      const w = window.open(childUrl("blank-open"), "_blank");
+      logLine("T02 window.open name=_blank title=FM Blank Window handle=" + (!!w));
+    });
+    const t03 = document.getElementById("t03-open");
+    t03.setAttribute("href", childUrl("anchor-blank"));
+    t03.addEventListener("click", function () {
+      logLine("T03 <a target=_blank> title=FM Anchor Blank");
+    });
+    const t04 = document.getElementById("t04-open");
+    t04.setAttribute("href", childUrl("anchor-named"));
+    t04.addEventListener("click", function () {
+      logLine("T04 <a target=fmWinInvoice> title=FM Invoice Window");
+    });
+    const form = document.getElementById("t05-form");
+    form.addEventListener("submit", function () {
+      logLine("T05 form target=_blank subject=" + document.getElementById("t05-subject").value);
+    });
+    document.getElementById("t06-open").addEventListener("click", function () {
+      const features = "width=640,height=480,menubar=no,toolbar=no,location=no,status=yes,resizable=yes,scrollbars=yes";
+      const w = window.open(childUrl("sized-popup"), "fmWinPopup", features);
+      logLine("T06 window.open name=fmWinPopup features handle=" + (!!w));
+    });
+    document.getElementById("t07-open").addEventListener("click", function () {
+      logLine("T07 scheduled 800ms name=fmWinDelayed");
+      window.setTimeout(function () {
+        const w = window.open(childUrl("delayed"), "fmWinDelayed");
+        logLine("T07 fired name=fmWinDelayed handle=" + (!!w));
+      }, 800);
+    });
+    document.getElementById("btn-clear-log").addEventListener("click", function () {
+      document.getElementById("event-log").textContent = "cleared\n";
+    });
+  }
+
+  if (childKey) renderChild(childKey);
+  else renderParent();
+})();
+</script>
+</body>
+</html>

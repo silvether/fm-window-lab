@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCase>
+  <!--
+    Second path: sized popup selected by JS name, then deselectPopUp back to parent.
+    name= is more stable than win_ser_N when the same recording is replayed
+    on a FortiMonitor probe that never saw Katalon's serial window table.
+  -->
+  <selenese>
+    <command>open</command>
+    <target><![CDATA[YOUR_HOSTED_URL/index.html]]></target>
+    <value><![CDATA[]]></value>
+  </selenese>
+  <selenese>
+    <command>click</command>
+    <target><![CDATA[id=t06-open]]></target>
+    <value><![CDATA[]]></value>
+  </selenese>
+  <selenese>
+    <command>pause</command>
+    <target><![CDATA[800]]></target>
+    <value><![CDATA[]]></value>
+  </selenese>
+  <selenese>
+    <command>selectWindow</command>
+    <target><![CDATA[name=fmWinPopup]]></target>
+    <value><![CDATA[]]></value>
+  </selenese>
+  <selenese>
+    <command>assertTitle</command>
+    <target><![CDATA[FM Sized Popup]]></target>
+    <value><![CDATA[]]></value>
+  </selenese>
+  <selenese>
+    <command>assertTextPresent</command>
+    <target><![CDATA[MARKER_POPUP_OK]]></target>
+    <value><![CDATA[]]></value>
+  </selenese>
+  <selenese>
+    <command>deselectPopUp</command>
+    <target><![CDATA[]]></target>
+    <value><![CDATA[]]></value>
+  </selenese>
+  <selenese>
+    <command>assertTitle</command>
+    <target><![CDATA[FM Window Lab Parent]]></target>
+    <value><![CDATA[]]></value>
+  </selenese>
+</TestCase>

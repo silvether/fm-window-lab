@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCase>
+  <!--
+    Functional example: move FortiMonitor / Katalon focus into a window the app spawned,
+    prove control in that window, then return to the parent.
+
+    Paste this into FortiMonitor → HTTP/HTTPS metric → Browser Synthetic (Multistep)
+    → Check Source → Selenium Source.
+
+    Replace YOUR_HOSTED_URL with the URL where index.html is actually served.
+    file:// will not run on a FortiMonitor probe.
+
+    Commands used are all on FortiMonitor's published multistep list:
+    open, assertTitle, click, pause, selectWindow, assertTextPresent, type, deselectPopUp.
+    Intentionally avoided: waitForPopUp, close, win_ser_N.
+  -->
+  <selenese>
+    <command>open</command>
+    <target><![CDATA[YOUR_HOSTED_URL/index.html]]></target>
+    <value><![CDATA[]]></value>
+  </selenese>
+  <selenese>
+    <command>assertTitle</command>
+    <target><![CDATA[FM Window Lab Parent]]></target>
+    <value><![CDATA[]]></value>
+  </selenese>
+  <selenese>
+    <command>click</command>
+    <target><![CDATA[id=t01-open]]></target>
+    <value><![CDATA[]]></value>
+  </selenese>
+  <selenese>
+    <command>pause</command>
+    <target><![CDATA[800]]></target>
+    <value><![CDATA[]]></value>
+  </selenese>
+  <selenese>
+    <command>selectWindow</command>
+    <target><![CDATA[title=FM Receipt Window]]></target>
+    <value><![CDATA[]]></value>
+  </selenese>
+  <selenese>
+    <command>assertTitle</command>
+    <target><![CDATA[FM Receipt Window]]></target>
+    <value><![CDATA[]]></value>
+  </selenese>
+  <selenese>
+    <command>assertTextPresent</command>
+    <target><![CDATA[MARKER_RECEIPT_OK]]></target>
+    <value><![CDATA[]]></value>
+  </selenese>
+  <selenese>
+    <command>type</command>
+    <target><![CDATA[id=child-note]]></target>
+    <value><![CDATA[window-focus-confirmed]]></value>
+  </selenese>
+  <selenese>
+    <command>click</command>
+    <target><![CDATA[id=child-ack]]></target>
+    <value><![CDATA[]]></value>
+  </selenese>
+  <selenese>
+    <command>assertTextPresent</command>
+    <target><![CDATA[FOCUS_ACK:window-focus-confirmed]]></target>
+    <value><![CDATA[]]></value>
+  </selenese>
+  <selenese>
+    <command>selectWindow</command>
+    <target><![CDATA[null]]></target>
+    <value><![CDATA[]]></value>
+  </selenese>
+  <selenese>
+    <command>assertTitle</command>
+    <target><![CDATA[FM Window Lab Parent]]></target>
+    <value><![CDATA[]]></value>
+  </selenese>
+</TestCase>
